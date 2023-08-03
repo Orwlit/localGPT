@@ -10,7 +10,7 @@ from langchain.chains import RetrievalQA
 from langchain.embeddings import HuggingFaceInstructEmbeddings
 
 # from langchain.embeddings import HuggingFaceEmbeddings
-from langchain.llms import HuggingFacePipeline
+from langchain.llms import HuggingFacePipeline, LlamaCpp
 
 # from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain.vectorstores import Chroma
@@ -26,7 +26,9 @@ from werkzeug.utils import secure_filename
 
 from constants import CHROMA_SETTINGS, EMBEDDING_MODEL_NAME, PERSIST_DIRECTORY
 
-DEVICE_TYPE = "cuda"
+###################
+DEVICE_TYPE = "mps"
+###################
 SHOW_SOURCES = True
 logging.info(f"Running on: {DEVICE_TYPE}")
 logging.info(f"Display Source Documents set to: {SHOW_SOURCES}")
@@ -44,9 +46,12 @@ else:
     print("The directory does not exist")
 
 run_langest_commands = ["python", "ingest.py"]
-if DEVICE_TYPE == "cpu":
+if DEVICE_TYPE != None:
     run_langest_commands.append("--device_type")
     run_langest_commands.append(DEVICE_TYPE)
+    print(f"running ingestion with command: \"{run_langest_commands[0]} {run_langest_commands[1]} --device_type {DEVICE_TYPE}\"")
+else: 
+    print(f"running ingestion with command: \"{run_langest_commands[0]} {run_langest_commands[1]}\"")
 
 result = subprocess.run(run_langest_commands, capture_output=True)
 if result.returncode != 0:
@@ -88,6 +93,25 @@ def load_model(device_type, model_id, model_basename=None):
     logging.info("This action can take a few minutes!")
 
     if model_basename is not None:
+        if ".ggml" in model_basename:
+            logging.info("Using Llamacpp for GGML quantized models")
+            model_path = "/Users/cr_mac_001/LLMs/llama2/Llama-2-13B-chat-GGML/llama-2-13b-chat.ggmlv3.q6_K.bin"
+            max_ctx_size = 4096
+            kwargs = {
+                "model_path": model_path,
+                "n_ctx": max_ctx_size,
+                "max_tokens": max_ctx_size,
+            }
+            if device_type.lower() == "mps":
+                kwargs["n_gpu_layers"] = 1
+                kwargs["n_batch"] = 512
+                kwargs["f16_kv"] = True
+            if device_type.lower() == "cuda":
+                kwargs["n_gpu_layers"] = 1000
+                kwargs["n_batch"] = max_ctx_size
+                
+            return LlamaCpp(**kwargs)
+        
         # The code supports all huggingface models that ends with GPTQ
         # and have some variation of .no-act.order or .safetensors in their HF repo.
         print("Using AutoGPTQForCausalLM for quantized models")
@@ -163,9 +187,18 @@ def load_model(device_type, model_id, model_basename=None):
 # Requires ~21GB VRAM. Using STransformers alongside can potentially create OOM on 24GB cards.
 # model_id = "TheBloke/wizardLM-7B-GPTQ"
 # model_basename = "wizardLM-7B-GPTQ-4bit.compat.no-act-order.safetensors"
-model_id = "TheBloke/WizardLM-7B-uncensored-GPTQ"
-model_basename = "WizardLM-7B-uncensored-GPTQ-4bit-128g.compat.no-act-order.safetensors"
+model_id = "TheBloke/Llama-2-13B-Chat-GGML"
+model_basename = "llama-2-13b-chat.ggmlv3.q6_K.bin"
 LLM = load_model(device_type=DEVICE_TYPE, model_id=model_id, model_basename=model_basename)
+
+# to load all llm data into memory for the firt time
+greeting_prompt = """
+greeting to me
+"""
+greeting_result = LLM(greeting_prompt)
+print("===== Wellcome to LocalGPT =====\n")
+print("\n> AI Greeting: ")
+print(greeting_result, "\n")
 
 QA = RetrievalQA.from_chain_type(
     llm=LLM, chain_type="stuff", retriever=RETRIEVER, return_source_documents=SHOW_SOURCES
@@ -218,10 +251,13 @@ def run_ingest_route():
             print("The directory does not exist")
 
         run_langest_commands = ["python", "ingest.py"]
-        if DEVICE_TYPE == "cpu":
+        if DEVICE_TYPE != None:
             run_langest_commands.append("--device_type")
             run_langest_commands.append(DEVICE_TYPE)
-            
+            print(f"running ingestion with command: \"{run_langest_commands[0]} {run_langest_commands[1]} --device_type {DEVICE_TYPE}\"")
+        else: 
+            print(f"running ingestion with command: \"{run_langest_commands[0]} {run_langest_commands[1]}\"")
+
         result = subprocess.run(run_langest_commands, capture_output=True)
         if result.returncode != 0:
             return "Script execution failed: {}".format(result.stderr.decode("utf-8")), 500
@@ -256,6 +292,7 @@ def prompt_route():
             "Answer": answer,
         }
 
+        # 从数据库中查询所有文献
         prompt_response_dict["Sources"] = []
         for document in docs:
             prompt_response_dict["Sources"].append(

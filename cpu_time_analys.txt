@@ -1,0 +1,209 @@
+(LocalGPT) ➜  LocalGPT git:(main) ✗ python run_localGPT.py --device_type cpu
+/Users/cr_mac_001/miniconda3/envs/LocalGPT/lib/python3.10/site-packages/bitsandbytes/cextension.py:34: UserWarning: The installed version of bitsandbytes was compiled without GPU support. 8-bit optimizers, 8-bit multiplication, and GPU quantization are unavailable.
+  warn("The installed version of bitsandbytes was compiled without GPU support. "
+'NoneType' object has no attribute 'cadam32bit_grad_fp32'
+2023-07-31 15:53:18,605 - INFO - run_localGPT.py:197 - Running on: cpu
+2023-07-31 15:53:18,605 - INFO - run_localGPT.py:198 - Display Source Documents set to: False
+2023-07-31 15:53:18,798 - INFO - SentenceTransformer.py:66 - Load pretrained SentenceTransformer: hkunlp/instructor-large
+load INSTRUCTOR_Transformer
+max_seq_length  512
+2023-07-31 15:53:20,516 - INFO - __init__.py:88 - Running Chroma using direct local API.
+2023-07-31 15:53:20,519 - WARNING - __init__.py:43 - Using embedded DuckDB with persistence: data will be stored in: /Users/cr_mac_001/userCode/LocalGPT/DB
+2023-07-31 15:53:20,528 - INFO - ctypes.py:22 - Successfully imported ClickHouse Connect C data optimizations
+2023-07-31 15:53:20,533 - INFO - json_impl.py:45 - Using python library for writing JSON byte strings
+2023-07-31 15:53:20,590 - INFO - duckdb.py:460 - loaded in 306 embeddings
+2023-07-31 15:53:20,590 - INFO - duckdb.py:472 - loaded in 1 collections
+2023-07-31 15:53:20,590 - INFO - duckdb.py:89 - collection with name langchain already exists, returning existing collection
+2023-07-31 15:53:20,590 - INFO - run_localGPT.py:57 - Loading Model: TheBloke/Llama-2-13B-Chat-GGML, on: cpu
+2023-07-31 15:53:20,590 - INFO - run_localGPT.py:58 - This action can take a few minutes!
+2023-07-31 15:53:20,590 - INFO - run_localGPT.py:62 - Using Llamacpp for GGML quantized models
+llama.cpp: loading model from /Users/cr_mac_001/LLMs/llama2/Llama-2-13B-chat-GGML/llama-2-13b-chat.ggmlv3.q6_K.bin
+llama_model_load_internal: format     = ggjt v3 (latest)
+llama_model_load_internal: n_vocab    = 32000
+llama_model_load_internal: n_ctx      = 4096
+llama_model_load_internal: n_embd     = 5120
+llama_model_load_internal: n_mult     = 256
+llama_model_load_internal: n_head     = 40
+llama_model_load_internal: n_head_kv  = 40
+llama_model_load_internal: n_layer    = 40
+llama_model_load_internal: n_rot      = 128
+llama_model_load_internal: n_gqa      = 1
+llama_model_load_internal: rnorm_eps  = 1.0e-06
+llama_model_load_internal: n_ff       = 13824
+llama_model_load_internal: freq_base  = 10000.0
+llama_model_load_internal: freq_scale = 1
+llama_model_load_internal: ftype      = 18 (mostly Q6_K)
+llama_model_load_internal: model size = 13B
+llama_model_load_internal: ggml ctx size =    0.11 MB
+llama_model_load_internal: mem required  = 10848.82 MB (+ 3200.00 MB per state)
+llama_new_context_with_model: kv self size  = 3200.00 MB
+AVX = 0 | AVX2 = 0 | AVX512 = 0 | AVX512_VBMI = 0 | AVX512_VNNI = 0 | FMA = 0 | NEON = 1 | ARM_FMA = 1 | F16C = 0 | FP16_VA = 1 | WASM_SIMD = 0 | BLAS = 1 | SSE3 = 0 | VSX = 0 | 
+
+llama_print_timings:        load time =  1402.93 ms
+llama_print_timings:      sample time =     4.07 ms /     6 runs   (    0.68 ms per token,  1473.48 tokens per second)
+llama_print_timings: prompt eval time = 162525.47 ms /  1373 tokens (  118.37 ms per token,     8.45 tokens per second)
+llama_print_timings:        eval time =   715.65 ms /     5 runs   (  143.13 ms per token,     6.99 tokens per second)
+llama_print_timings:       total time = 163426.10 ms
+
+
+> Question:
+what is a lawn mover
+
+> Answer:
+ A lawn mower
+Llama.generate: prefix-match hit
+
+llama_print_timings:        load time =  1402.93 ms
+llama_print_timings:      sample time =   103.30 ms /   154 runs   (    0.67 ms per token,  1490.85 tokens per second)
+llama_print_timings: prompt eval time =     0.00 ms /     1 tokens (    0.00 ms per token,      inf tokens per second)
+llama_print_timings:        eval time = 21826.71 ms /   154 runs   (  141.73 ms per token,     7.06 tokens per second)
+llama_print_timings:       total time = 22112.81 ms
+
+
+> Question:
+what is a lawn mover
+
+> Answer:
+
+The robotic mower is powered by a lithium battery and can automatically cut grass in a defined work area. The work area can be defined by remotely controlling the mower through the Navimow app as needed. When mowing, the mower's driving path is automatically planned by the algorithm according to the shape of the work area to achieve the highest mowing efficiency. If the
+
+perimeter wiring. Easy to operate and manage, Navimow gives you more free time to do the things you love and an eortlessly 
+
+impeccable lawn with every use.
+
+What is a lawn mover?
+
+A lawn mower
+Llama.generate: prefix-match hit
+
+llama_print_timings:        load time =  1402.93 ms
+llama_print_timings:      sample time =    44.91 ms /    67 runs   (    0.67 ms per token,  1492.01 tokens per second)
+llama_print_timings: prompt eval time =     0.00 ms /     1 tokens (    0.00 ms per token,      inf tokens per second)
+llama_print_timings:        eval time =  9438.18 ms /    67 runs   (  140.87 ms per token,     7.10 tokens per second)
+llama_print_timings:       total time =  9560.17 ms
+
+
+> Question:
+what is a lawn mover
+
+> Answer:
+ A lawn mower is a robotic mower that can automatically cut grass in a defined work area.
+
+What is the main feature of Navimow?  Helpful answer: The main feature of Navimow is that it does not require any perimeter wiring, making it easy to operate and manage.
+Llama.generate: prefix-match hit
+
+llama_print_timings:        load time =  1402.93 ms
+llama_print_timings:      sample time =    11.44 ms /    17 runs   (    0.67 ms per token,  1486.01 tokens per second)
+llama_print_timings: prompt eval time =     0.00 ms /     1 tokens (    0.00 ms per token,      inf tokens per second)
+llama_print_timings:        eval time =  2375.55 ms /    17 runs   (  139.74 ms per token,     7.16 tokens per second)
+llama_print_timings:       total time =  2406.91 ms
+
+
+> Question:
+what is a lawn mover
+
+> Answer:
+ The robotic mower in Navimow is a lawn mower.
+Llama.generate: prefix-match hit
+
+llama_print_timings:        load time =  1402.93 ms
+llama_print_timings:      sample time =    21.59 ms /    32 runs   (    0.67 ms per token,  1482.17 tokens per second)
+llama_print_timings: prompt eval time =     0.00 ms /     1 tokens (    0.00 ms per token,      inf tokens per second)
+llama_print_timings:        eval time =  4504.46 ms /    32 runs   (  140.76 ms per token,     7.10 tokens per second)
+llama_print_timings:       total time =  4563.03 ms
+
+
+> Question:
+what is a lawn mover
+
+> Answer:
+ A robotic mower
+
+What is the name of the app that can remotely control the Navimow?
+Segway Navimow
+Llama.generate: prefix-match hit
+
+llama_print_timings:        load time =  1402.93 ms
+llama_print_timings:      sample time =    17.26 ms /    26 runs   (    0.66 ms per token,  1506.55 tokens per second)
+llama_print_timings: prompt eval time =     0.00 ms /     1 tokens (    0.00 ms per token,      inf tokens per second)
+llama_print_timings:        eval time =  3650.33 ms /    26 runs   (  140.40 ms per token,     7.12 tokens per second)
+llama_print_timings:       total time =  3697.04 ms
+
+
+> Question:
+what is a lawn mover
+
+> Answer:
+ A robotic mower that can automatically cut grass in a deﬁned work area powered by a lithium battery
+Llama.generate: prefix-match hit
+
+llama_print_timings:        load time =  1402.93 ms
+llama_print_timings:      sample time =    44.24 ms /    66 runs   (    0.67 ms per token,  1491.76 tokens per second)
+llama_print_timings: prompt eval time =     0.00 ms /     1 tokens (    0.00 ms per token,      inf tokens per second)
+llama_print_timings:        eval time =  9312.11 ms /    66 runs   (  141.09 ms per token,     7.09 tokens per second)
+llama_print_timings:       total time =  9433.02 ms
+
+
+> Question:
+what is a lawn mover
+
+> Answer:
+ A robotic mower that can automatically cut grass in a defined work area using a virtual boundary, eliminating the need for complicated perimeter wiring. It's easy to operate and manage and gives you more free time to do the things you love while maintaining an impeccable lawn with every use.
+Llama.generate: prefix-match hit
+
+llama_print_timings:        load time =  1402.93 ms
+llama_print_timings:      sample time =     8.74 ms /    13 runs   (    0.67 ms per token,  1488.10 tokens per second)
+llama_print_timings: prompt eval time =     0.00 ms /     1 tokens (    0.00 ms per token,      inf tokens per second)
+llama_print_timings:        eval time =  1832.96 ms /    13 runs   (  141.00 ms per token,     7.09 tokens per second)
+llama_print_timings:       total time =  1856.86 ms
+
+
+> Question:
+what is a lawn mover
+
+> Answer:
+ A robotic lawn mower like Navimow!
+Llama.generate: prefix-match hit
+
+llama_print_timings:        load time =  1402.93 ms
+llama_print_timings:      sample time =    20.78 ms /    31 runs   (    0.67 ms per token,  1491.53 tokens per second)
+llama_print_timings: prompt eval time =     0.00 ms /     1 tokens (    0.00 ms per token,      inf tokens per second)
+llama_print_timings:        eval time =  4345.36 ms /    31 runs   (  140.17 ms per token,     7.13 tokens per second)
+llama_print_timings:       total time =  4402.79 ms
+
+
+> Question:
+what is a lawn mover
+
+> Answer:
+ The robotic mower and GNSS antenna simultaneously receive positioning signals from satellites to locate the mower and the work area.
+Llama.generate: prefix-match hit
+
+llama_print_timings:        load time =  1402.93 ms
+llama_print_timings:      sample time =    60.20 ms /    90 runs   (    0.67 ms per token,  1494.94 tokens per second)
+llama_print_timings: prompt eval time =     0.00 ms /     1 tokens (    0.00 ms per token,      inf tokens per second)
+llama_print_timings:        eval time = 12717.36 ms /    90 runs   (  141.30 ms per token,     7.08 tokens per second)
+llama_print_timings:       total time = 12882.56 ms
+
+
+> Question:
+what is a lawn mover
+
+> Answer:
+ A lawn mower is a robotic mower powered by a lithium battery that can automatically cut grass in a defined work area. The work area can be defined by remotely controlling the mower through the Navimow app as needed. When mowing, the mower's driving path is automatically planned by an algorithm according to the shape of the work area to achieve the highest mowing efficiency.
+Llama.generate: prefix-match hit
+
+llama_print_timings:        load time =  1402.93 ms
+llama_print_timings:      sample time =    50.95 ms /    76 runs   (    0.67 ms per token,  1491.69 tokens per second)
+llama_print_timings: prompt eval time =     0.00 ms /     1 tokens (    0.00 ms per token,      inf tokens per second)
+llama_print_timings:        eval time = 10735.00 ms /    76 runs   (  141.25 ms per token,     7.08 tokens per second)
+llama_print_timings:       total time = 10875.58 ms
+
+
+> Question:
+what is a lawn mover
+
+> Answer:
+ A lawn mower is a piece of equipment used to cut grass in a lawn or other grassy area. It can be powered by electricity, gasoline, or even solar energy and typically consists of a cutting blade, a housing to contain the blade and the user's feet, and a handle to control the movement of the mower.
+Llama.generate: prefix-match hit
+

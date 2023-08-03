@@ -2,22 +2,35 @@ import logging
 
 import click
 import torch
-from auto_gptq import AutoGPTQForCausalLM
+
+# UserWarning: The installed version of bitsandbytes was compiled without GPU support. 8-bit optimizers, 8-bit multiplication, and GPU quantization are unavailable.
+# warn("The installed version of bitsandbytes was compiled without GPU support. "
+# 'NoneType' object has no attribute 'cadam32bit_grad_fp32'
+from auto_gptq import AutoGPTQForCausalLM 
+
 from huggingface_hub import hf_hub_download
 from langchain.chains import RetrievalQA
+
 from langchain.embeddings import HuggingFaceInstructEmbeddings
+
 from langchain.llms import HuggingFacePipeline, LlamaCpp
 
 # from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain.vectorstores import Chroma
-from transformers import (
-    AutoModelForCausalLM,
-    AutoTokenizer,
-    GenerationConfig,
-    LlamaForCausalLM,
-    LlamaTokenizer,
-    pipeline,
-)
+
+
+from transformers import AutoModelForCausalLM
+from transformers import AutoTokenizer
+from transformers import GenerationConfig
+
+# UserWarning: The installed version of bitsandbytes was compiled without GPU support. 8-bit optimizers, 8-bit multiplication, and GPU quantization are unavailable.
+#   warn("The installed version of bitsandbytes was compiled without GPU support. "
+# 'NoneType' object has no attribute 'cadam32bit_grad_fp32'
+from transformers import LlamaForCausalLM
+
+from transformers import LlamaTokenizer
+from transformers import pipeline
+
 
 from constants import CHROMA_SETTINGS, EMBEDDING_MODEL_NAME, PERSIST_DIRECTORY
 
@@ -46,41 +59,45 @@ def load_model(device_type, model_id, model_basename=None):
     if model_basename is not None:
         if ".ggml" in model_basename:
             logging.info("Using Llamacpp for GGML quantized models")
-            model_path = hf_hub_download(repo_id=model_id, filename=model_basename)
-            max_ctx_size = 2048
+            # model_path = hf_hub_download(repo_id=model_id, filename=model_basename)
+            model_path = "/Users/cr_mac_001/LLMs/llama2/Llama-2-13B-chat-GGML/llama-2-13b-chat.ggmlv3.q6_K.bin"
+            max_ctx_size = 4096
             kwargs = {
                 "model_path": model_path,
                 "n_ctx": max_ctx_size,
                 "max_tokens": max_ctx_size,
             }
             if device_type.lower() == "mps":
-                kwargs["n_gpu_layers"] = 1000
+                kwargs["n_gpu_layers"] = 1
+                kwargs["n_batch"] = 512
+                kwargs["f16_kv"] = True
             if device_type.lower() == "cuda":
                 kwargs["n_gpu_layers"] = 1000
                 kwargs["n_batch"] = max_ctx_size
+                
             return LlamaCpp(**kwargs)
 
-        else:
-            # The code supports all huggingface models that ends with GPTQ and have some variation
-            # of .no-act.order or .safetensors in their HF repo.
-            logging.info("Using AutoGPTQForCausalLM for quantized models")
+        # else:
+        #     # The code supports all huggingface models that ends with GPTQ and have some variation
+        #     # of .no-act.order or .safetensors in their HF repo.
+        #     logging.info("Using AutoGPTQForCausalLM for quantized models")
 
-            if ".safetensors" in model_basename:
-                # Remove the ".safetensors" ending if present
-                model_basename = model_basename.replace(".safetensors", "")
+        #     if ".safetensors" in model_basename:
+        #         # Remove the ".safetensors" ending if present
+        #         model_basename = model_basename.replace(".safetensors", "")
 
-            tokenizer = AutoTokenizer.from_pretrained(model_id, use_fast=True)
-            logging.info("Tokenizer loaded")
+        #     tokenizer = AutoTokenizer.from_pretrained(model_id, use_fast=True)
+        #     logging.info("Tokenizer loaded")
 
-            model = AutoGPTQForCausalLM.from_quantized(
-                model_id,
-                model_basename=model_basename,
-                use_safetensors=True,
-                trust_remote_code=True,
-                device="cuda:0",
-                use_triton=False,
-                quantize_config=None,
-            )
+        #     model = AutoGPTQForCausalLM.from_quantized(
+        #         model_id,
+        #         model_basename=model_basename,
+        #         use_safetensors=True,
+        #         trust_remote_code=True,
+        #         device="cuda:0",
+        #         use_triton=False,
+        #         quantize_config=None,
+        #     )
     elif (
         device_type.lower() == "cuda"
     ):  # The code supports all huggingface models that ends with -HF or which have a .bin
@@ -178,7 +195,7 @@ def main(device_type, show_sources):
     logging.info(f"Running on: {device_type}")
     logging.info(f"Display Source Documents set to: {show_sources}")
 
-    embeddings = HuggingFaceInstructEmbeddings(model_name=EMBEDDING_MODEL_NAME, model_kwargs={"device": device_type})
+    embeddings = HuggingFaceInstructEmbeddings(model_name=EMBEDDING_MODEL_NAME, model_kwargs={"device": device_type}) # 不是这里弹出的bitsandbytes不支持GPU？？
 
     # uncomment the following line if you used HuggingFaceEmbeddings in the ingest.py
     # embeddings = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL_NAME)
@@ -191,50 +208,31 @@ def main(device_type, show_sources):
     )
     retriever = db.as_retriever()
 
-    # load the LLM for generating Natural Language responses
-
-    # for HF models
-    # model_id = "TheBloke/vicuna-7B-1.1-HF"
-    # model_basename = None
-    # model_id = "TheBloke/Wizard-Vicuna-7B-Uncensored-HF"
-    # model_id = "TheBloke/guanaco-7B-HF"
-    # model_id = 'NousResearch/Nous-Hermes-13b' # Requires ~ 23GB VRAM. Using STransformers
-    # alongside will 100% create OOM on 24GB cards.
-    # llm = load_model(device_type, model_id=model_id)
-
-    # for GPTQ (quantized) models
-    # model_id = "TheBloke/Nous-Hermes-13B-GPTQ"
-    # model_basename = "nous-hermes-13b-GPTQ-4bit-128g.no-act.order"
-    # model_id = "TheBloke/WizardLM-30B-Uncensored-GPTQ"
-    # model_basename = "WizardLM-30B-Uncensored-GPTQ-4bit.act-order.safetensors" # Requires
-    # ~21GB VRAM. Using STransformers alongside can potentially create OOM on 24GB cards.
-    # model_id = "TheBloke/wizardLM-7B-GPTQ"
-    # model_basename = "wizardLM-7B-GPTQ-4bit.compat.no-act-order.safetensors"
-    # model_id = "TheBloke/WizardLM-7B-uncensored-GPTQ"
-    # model_basename = "WizardLM-7B-uncensored-GPTQ-4bit-128g.compat.no-act-order.safetensors"
-
-    # for GGML (quantized cpu+gpu+mps) models - check if they support llama.cpp
-    # model_id = "TheBloke/wizard-vicuna-13B-GGML"
-    # model_basename = "wizard-vicuna-13B.ggmlv3.q4_0.bin"
-    # model_basename = "wizard-vicuna-13B.ggmlv3.q6_K.bin"
-    # model_basename = "wizard-vicuna-13B.ggmlv3.q2_K.bin"
-    # model_id = "TheBloke/orca_mini_3B-GGML"
-    # model_basename = "orca-mini-3b.ggmlv3.q4_0.bin"
-
-    model_id = "TheBloke/Llama-2-7B-Chat-GGML"
-    model_basename = "llama-2-7b-chat.ggmlv3.q4_0.bin"
+    model_id = "TheBloke/Llama-2-13B-Chat-GGML"
+    model_basename = "llama-2-13b-chat.ggmlv3.q6_K.bin"
 
     llm = load_model(device_type, model_id=model_id, model_basename=model_basename)
 
-    qa = RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", retriever=retriever, return_source_documents=True)
+    qa = RetrievalQA.from_chain_type(llm, chain_type="stuff", retriever=retriever, return_source_documents=True)
+    # qa = RetrievalQA.from_chain_type(llm,retriever=vectorstore.as_retriever())
     # Interactive questions and answers
     while True:
-        query = input("\nEnter a query: ")
-        if query == "exit":
-            break
+        # query = input("\nEnter a query: ")
+        # if query == "exit":
+        #     break
         # Get the answer from the chain
-        res = qa(query)
+        
+        query = "what is vins"
+        results = retriever.get_relevant_documents(query=query)
+        print(results)
+        
+        
+        
+        res = qa(query) # TODO: without GPU support!!!
         answer, docs = res["result"], res["source_documents"]
+
+
+
 
         # Print the result
         print("\n\n> Question:")
