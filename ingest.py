@@ -121,7 +121,7 @@ def split_documents(documents: list[Document]) -> tuple[list[Document], list[Doc
 )
 
 def main(device_type):
-    chunk_size = 400
+    chunk_size = 1000
     
     # Load documents and split in chunks
     logging.info(f"Loading documents from {SOURCE_DIRECTORY}")
@@ -152,7 +152,7 @@ def main(device_type):
         texts,
         embeddings,
         persist_directory=PERSIST_DIRECTORY,
-        client_settings=CHROMA_SETTINGS,
+        # client_settings=CHROMA_SETTINGS,
     )
     db.persist()
     db = None
